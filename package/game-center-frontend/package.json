@@ -1,0 +1,79 @@
+{
+  "name": "game-center-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.0",
+    "@mui/material": "^5.14.4",
+    "axios": "^1.5.0",
+    "bcryptjs": "^2.4.3",
+    "game-2048": "*",
+    "i18next": "^23.4.6",
+    "js-sha256": "^0.9.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-google-recaptcha": "^3.1.0",
+    "react-i18next": "^13.0.1",
+    "react-number-format": "^5.2.3",
+    "react-redux": "^8.1.1",
+    "react-router-dom": "^6.14.2",
+    "react-scripts": "^5.0.1",
+    "@tanstack/react-query": "^4.30.0",
+    "@reduxjs/toolkit": "^1.9.5",
+    "react-lazyload": "^3.2.0",
+    "webp-loader": "^0.6.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.13",
+    "babel-loader": "^9.0.0",
+    "customize-cra": "^1.0.0",
+    "cypress": "^12.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jest": "^29.0.0",
+    "prettier": "^3.0.2",
+    "react-app-rewire-postcss": "^3.0.2",
+    "react-app-rewired": "^2.2.1",
+    "sass": "^1.58.3",
+    "tailwindcss": "^3.2.0",
+    "@storybook/addon-actions": "^7.0.0",
+    "@storybook/addon-links": "^7.0.0",
+    "@storybook/react": "^7.0.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0"
+  },
+  "scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject",
+    "lint": "eslint src"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "author": "Sizin İsminiz",
+  "license": "MIT"
+}

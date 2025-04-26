@@ -1,0 +1,36 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Game Center API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "http://localhost:3001/api" }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "Login",
+        "responses": {
+          "200": { "description": "Başarılı giriş." }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "responses": {
+          "200": { "description": "Uygulama durumu: UP." }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "summary": "Prometheus metrikleri",
+        "responses": {
+          "200": { "description": "Prometheus formatındaki metrikler." }
+        }
+      }
+    }
+  }
+}
