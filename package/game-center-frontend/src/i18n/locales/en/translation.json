@@ -41,5 +41,20 @@
   "registration_failed_check_info": "Registration failed. Please check your information.",
   "activeLobbies": "Active Lobbies",
   "play": "Play",
-  "gameNotFound": "Game Not Found"
+  "gameNotFound": "Game Not Found",
+  "lobbyName": "Lobby Name",
+  "eventStart": "Event Start",
+  "eventEnd": "Event End",
+  "shareLink": "Share Link",
+  "copy": "Copy",
+  "lobbyCreated": "Lobby Created",
+  "lobbyCreationFailed": "Lobby creation failed.",
+  "updateLobby": "Update Lobby",
+  "lobbyUpdateFailed": "Lobby update failed.",
+  "cancel": "Cancel",
+  "createdAgo": "{{hours}} hours ago",
+  "startsAt": "Starts at",
+  "startsIn": "Starts in",
+  "ongoing": "Ongoing",
+  "ended": "Ended"
 }

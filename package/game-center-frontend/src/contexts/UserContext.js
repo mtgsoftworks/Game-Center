@@ -9,12 +9,14 @@ function UserProvider({ children }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Kullanıcı bilgisini al
-    const fetchUser = async () => {
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
-    };
-    fetchUser();
+    // Auto-login only if no stored credentials
+    if (!localStorage.getItem('credentials')) {
+      const fetchUser = async () => {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      };
+      fetchUser();
+    }
   }, []);
 
   const value = useMemo(() => ({ user, setUser }), [user]);

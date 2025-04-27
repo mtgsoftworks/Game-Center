@@ -9,6 +9,7 @@ import {
   Menu,
   MenuItem,
   Button,
+  Box,
 } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { Link, useNavigate } from 'react-router-dom';
@@ -47,7 +48,7 @@ function Navbar() {
           Oyun Merkezi
         </Typography>
         {user ? (
-          <div>
+          <Box>
             <IconButton
               size="large"
               edge="end"
@@ -69,9 +70,17 @@ function Navbar() {
               >
                 {t('profile')}
               </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  navigate('/settings');
+                }}
+              >
+                {t('settings')}
+              </MenuItem>
               <MenuItem onClick={handleLogout}>{t('logout')}</MenuItem>
             </Menu>
-          </div>
+          </Box>
         ) : (
           <Button color="inherit" component={Link} to="/login">
             {t('login')}

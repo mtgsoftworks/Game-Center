@@ -8,8 +8,17 @@ function Chat({ channel }) {
   const [input, setInput] = useState('');
   
   useEffect(() => {
+    // Request notification permission on mount
+    if ('Notification' in window && Notification.permission !== 'granted') {
+      Notification.requestPermission();
+    }
     const socket = connectWebSocket(channel, (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+      // Show browser notification if page hidden
+      if (document.hidden && Notification.permission === 'granted') {
+        // eslint-disable-next-line no-new
+        new Notification(message.user, { body: message.text });
+      }
+      setMessages((prevMessages) => [...prevMessages, { ...message, id: `${Date.now()}-${Math.random()}` }]);
     });
     
     return () => {
@@ -25,8 +34,8 @@ function Chat({ channel }) {
   return (
     <Paper>
       <List>
-        {messages.map((msg, index) => (
-          <ListItem key={index}>
+        {messages.map((msg) => (
+          <ListItem key={msg.id}>
             <ListItemText primary={msg.user} secondary={msg.text} />
           </ListItem>
         ))}

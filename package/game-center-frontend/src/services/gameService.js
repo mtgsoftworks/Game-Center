@@ -1,8 +1,6 @@
 // src/services/gameService.js
 
-import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+import axios from './axiosInstance';
 
 // Oyun verileri için yedek statik veri
 const fallbackGames = [
@@ -20,7 +18,7 @@ const fallbackGames = [
 
 export const getGames = async () => {
   try {
-    const response = await axios.get(`${API_URL}/games`, { withCredentials: true });
+    const response = await axios.get('/games');
     return response.data;
   } catch (error) {
     console.error('API çağrısı başarısız oldu, statik oyun verileri kullanılıyor:', error);
@@ -31,7 +29,7 @@ export const getGames = async () => {
 // Oyun detaylarını almak için fonksiyon
 export const getGameDetails = async (gameId) => {
   try {
-    const response = await axios.get(`${API_URL}/games/${gameId}`, { withCredentials: true });
+    const response = await axios.get(`/games/${gameId}`);
     return response.data;
   } catch (error) {
     console.error(`API çağrısı başarısız oldu, statik oyun verileri kullanılıyor:`, error);

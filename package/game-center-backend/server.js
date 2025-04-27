@@ -1,17 +1,32 @@
-// server.js
+// server.js: Oyun Merkezi backend uygulamasının ana dosyası.
+// - Express ile HTTP sunucusu oluşturulur.
+// - Global middleware ve route yapılandırmaları burada tanımlanır.
+// - API route'ları eklenir ve global hata işleme yapılandırılır.
+// - Çalışan sunucu belirtilen portta dinlemeye alınır.
 
+// Express çerçevesini import ederek uygulama oluşturulacak
 const express = require('express');
-const session = require('express-session');
+
+// Gönderilen JSON ve URL-encoded request gövdelerini parse etmek için body-parser
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const MemoryStore = require('memorystore')(session);
+
+// Farklı origin’lerden gelen istekleri kontrol etmek için CORS ayarları
 const cors = require('cors');
-const mongoose = require('mongoose');
+
+// Dosya ve dizin yolları işlemleri için path modülü
 const path = require('path');
+
+// Güvenlik başlıkları eklemek için Helmet middleware
 const helmet = require('helmet');
+
+// HTTP yanıtlarını sıkıştırarak performans iyileştirmesi sağlayan compression
 const compression = require('compression');
+
+// Gelen isteklerin loglanması için Morgan kullanılıyor
 const morgan = require('morgan');
-const mongoSanitize = require('express-mongo-sanitize');
+
+// Firebase Admin SDK üzerinden Firestore (db) ve Auth (auth) modüllerini import ediyoruz
+const { db, auth, admin } = require('./utils/firebase');
 
 // .env dosyasından çevre değişkenlerini yükleyin
 require('dotenv').config();
@@ -20,50 +35,46 @@ require('dotenv').config();
 const app = express();
 
 // Güvenlik başlıkları ekle
+// Helmet ile uygulamaya güvenlik başlıkları ekleniyor (XSS, HSTS vb.)
 app.use(helmet());
-// Response sıkıştır
-app.use(compression());
-// İstek logging
-app.use(morgan('combined'));
-// NoSQL/SQL injection koruması
-app.use(mongoSanitize());
 
-// Veritabanı Bağlantısı
-mongoose
-  .connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/oyunmerkezi', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log('Veritabanına bağlandı.');
-  })
-  .catch((err) => {
-    console.error('Veritabanı bağlantı hatası:', err);
-  });
+// Response sıkıştır
+// Yanıt boyutunu küçültmek için gzip sıkıştırması uygulanıyor
+app.use(compression());
+
+// İstek logging
+// Tüm HTTP istekleri konsola ve dosyalara loglanıyor
+app.use(morgan('combined'));
 
 // Orta Katmanlar
+// Cross-Origin Resource Sharing (CORS) yapılandırması
 app.use(
   cors({
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    credentials: true,
+    credentials: true, // Çerezlerin ve header’ların gönderilmesine izin ver
   })
 );
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+const cookieParser = require('cookie-parser');
+// parse cookies for session token
 app.use(cookieParser());
-app.use(
-  session({
-    store: new MemoryStore({ checkPeriod: 86400000 }),
-    secret: process.env.SESSION_SECRET || '4d2f5c3a7b98e6e74f56a9d48a3f7d1b2c6e3f8a9d2e4b5f6c8a9d2f3e7a6b5',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false, // HTTPS kullanmıyorsanız false olmalıdır
-      httpOnly: true,
-      maxAge: 86400000, // 1 gün
-    },
-  })
-);
+
+// Session Store
+const session = require('express-session');
+const MemoryStore = require('memorystore')(session);
+
+app.use(session({
+  cookie: { maxAge: 86400000 }, // 24 saat
+  store: new MemoryStore({
+    checkPeriod: 86400000 // 24 saat
+  }),
+  resave: false,
+  saveUninitialized: false,
+  secret: process.env.SESSION_SECRET || 'secret'
+}));
 
 // Rota Dosyaları
 const authRoutes = require('./routes/auth');
@@ -71,9 +82,9 @@ const gameRoutes = require('./routes/game');
 const lobbyRoutes = require('./routes/lobby');
 
 // Rota Kullanımı
-app.use('/api/auth', authRoutes);
-app.use('/api/games', gameRoutes);
-app.use('/api/lobbies', lobbyRoutes);
+app.use('/api/auth', authRoutes);   // Kimlik doğrulama API route'ları
+app.use('/api/games', gameRoutes);  // Oyun listeleme API route'ları
+app.use('/api/lobbies', lobbyRoutes);// Lobi yönetimi API route'ları
 
 // Statik Dosyalar İçin Ayar (Üretim Ortamında)
 // Eğer frontend uygulamanız build edilip public klasörüne yerleştirilmişse aşağıdaki kodu kullanabilirsiniz
@@ -87,11 +98,11 @@ if (process.env.NODE_ENV === 'production') {
 
 // 404 handler
 const notFound = require('./middleware/notFound');
-app.use(notFound);
+app.use(notFound);    // Tanımsız route'lar için 404 handler'ı
 
 // Global Error Handler
 const errorHandler = require('./middleware/errorHandler');
-app.use(errorHandler);
+app.use(errorHandler); // Global hata yakalama middleware'i
 
 // Hata Yakalama Orta Katmanı
 app.use((err, req, res, next) => {
@@ -99,8 +110,29 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Sunucu Hatası.' });
 });
 
+// Zamanlanmış görevler için cron
+const cron = require('node-cron');
+
 // Sunucuyu Başlatma
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
+app.listen(PORT, () => { // Sunucuyu belirtilen PORT'ta başlatır
   console.log(`Backend sunucusu ${PORT} portunda çalışıyor.`);
 });
+
+// Cron job: Normal lobileri 8 saat sonra otomatik sil
+cron.schedule('0 * * * *', async () => {
+  try {
+    const cutoff = admin.firestore.Timestamp.fromDate(new Date(Date.now() - 8 * 3600000));
+    const snapshot = await db.collection('lobbies')
+      .where('type', '==', 'normal')
+      .where('createdAt', '<=', cutoff)
+      .get();
+    snapshot.forEach(doc => doc.ref.delete());
+    console.log(`Cron: Silinen ${snapshot.size} eski normal lobiler.`);
+  } catch (err) {
+    console.error('Cron cleanup error:', err);
+  }
+});
+
+// Testler için app export
+module.exports = app;

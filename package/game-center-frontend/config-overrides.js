@@ -1,4 +1,4 @@
-const { override, removeModuleScopePlugin, babelInclude, addBabelPreset } = require('customize-cra');
+const { override, removeModuleScopePlugin, babelInclude, addBabelPreset, addWebpackModuleRule, addWebpackAlias, addLessLoader, fixBabelImports, addWebpackPlugin, addBundleVisualizer } = require('customize-cra');
 const path = require('path');
 
 module.exports = override(
@@ -8,6 +8,24 @@ module.exports = override(
     path.resolve(__dirname, '../games/game_2048/lib'),
   ]),
   addBabelPreset('@babel/preset-typescript'),
+  // support .mjs modules in node_modules
+  addWebpackModuleRule({
+    test: /\.mjs$/,
+    include: /[\\/]node_modules[\\/]/,
+    type: 'javascript/auto',
+  }),
+  // disable fullySpecified for all @mui packages to allow extension-less imports
+  addWebpackModuleRule({
+    test: /\.js$/,
+    include: /[\\/]node_modules[\\/]@mui[\\/]/,
+    resolve: { fullySpecified: false },
+  }),
+  // allow extension-less imports in @mui/x-date-pickers
+  addWebpackModuleRule({
+    test: /\.js$/,
+    include: /[\\/]node_modules[\\/]@mui[\\/]x-date-pickers[\\/]/,
+    resolve: { fullySpecified: false },
+  }),
   (config, env) => {
     config.resolve.extensions.push('.ts', '.tsx');
     // include both local and monorepo root node_modules in resolution

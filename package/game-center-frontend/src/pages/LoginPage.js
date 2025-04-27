@@ -1,6 +1,6 @@
 // src/pages/LoginPage.js
 
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   TextField,
   Button,
@@ -23,6 +23,20 @@ import LanguageSelector from '../components/LanguageSelector'; // Dil seçici ek
 function LoginPage() {
   const { t } = useTranslation();
   const { setUser } = useContext(UserContext);
+  // Prefill credentials if saved
+  useEffect(() => {
+    const stored = localStorage.getItem('credentials');
+    if (stored) {
+      try {
+        const { email: e, password: p } = JSON.parse(stored);
+        setEmail(e);
+        setPassword(p);
+        setRememberMe(true);
+      } catch (err) {
+        console.error('Error parsing stored credentials', err);
+      }
+    }
+  }, []);
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,13 +49,19 @@ function LoginPage() {
     try {
       const userData = await login(email, password);
       setUser(userData);
+      // store token
+      localStorage.setItem('user', JSON.stringify(userData));
+      // manage remember me credentials
       if (rememberMe) {
-        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('credentials', JSON.stringify({ email, password }));
+      } else {
+        localStorage.removeItem('credentials');
       }
       navigate('/');
     } catch (err) {
       console.error('Giriş hatası:', err);
-      setError(t('loginError') || 'Giriş başarısız.');
+      const msg = err.response?.data?.message;
+      setError(msg || t('loginError') || 'Giriş başarısız.');
     }
   };
 

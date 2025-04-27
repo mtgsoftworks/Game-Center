@@ -9,7 +9,7 @@ function SinglePlayerGamePage() {
     // Oyun mantığı burada uygulanır
     const randomScore = Math.floor(Math.random() * 100);
     setScore(randomScore);
-    alert(`Oyun bitti! Skorunuz: ${randomScore}`);
+    console.info(`Oyun bitti! Skorunuz: ${randomScore}`);
   };
 
   return (

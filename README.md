@@ -2,7 +2,7 @@
 
 Game Center is a full-stack web application for playing casual games and managing real-time lobbies with chat. It uses a monorepo structure powered by Lerna and includes:
 
-- **Backend**: Node.js + Express with Firebase Auth (Google & email/password), Firestore database, Mailtrap for emailing, and WebSocket for chat.
+- **Backend**: Node.js + Express with Firebase Auth (Google & email/password), Firestore database and WebSocket for chat.
 - **Frontend**: React with MUI, Redux Toolkit, React Query, React Router, i18n (react-i18next), and PWA support.
 - **Games**: Lerna-managed packages (e.g., 2048 and Tombola) lazy-loaded into the React app.
 

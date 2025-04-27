@@ -13,6 +13,12 @@ export const createLobby = async (lobbyData) => {
   return response.data;
 };
 
+// Fetch a single lobby by ID
+export const getLobby = async (id) => {
+  const response = await axios.get(`/lobbies/${id}`);
+  return response.data;
+};
+
 // Diğer CRUD işlemleri
 export const updateLobby = async (id, lobbyData) => {
   const response = await axios.put(`/lobbies/${id}`, lobbyData);

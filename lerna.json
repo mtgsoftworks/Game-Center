@@ -1,8 +1,7 @@
 {
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "packages": [
-    "package/*",
-    "package/games/*"
+    "packages/*"
   ],
   "version": "0.0.0",
   "npmClient": "yarn"

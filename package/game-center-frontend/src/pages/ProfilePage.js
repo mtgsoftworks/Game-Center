@@ -16,8 +16,8 @@ function ProfilePage() {
   }
 
   const handleEditProfile = () => {
-    // Profil düzenleme işlemleri
-    alert(t('editProfileNotImplemented'));
+    // TODO: Implement edit profile modal
+    console.info('Edit profile not implemented');
   };
 
   return (

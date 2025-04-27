@@ -1,7 +1,7 @@
-// src/pages/LobbyManagementPage.js
 import React, { useEffect, useState } from 'react';
-import { Typography, Container, Button, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
-import { getLobbies, updateLobby, deleteLobby } from '../services/lobbyService';
+import { Typography, Container, Button } from '@mui/material';
+import MaterialTable from 'react-material-table';
+import { getLobbies, deleteLobby } from '../services/lobbyService';
 
 function LobbyManagementPage() {
   const [lobbies, setLobbies] = useState([]);
@@ -20,7 +20,7 @@ function LobbyManagementPage() {
   };
 
   const handleEdit = (lobby) => {
-    // Lobi güncelleme işlemleri
+    console.log('Edit lobby', lobby._id);
   };
 
   const handleDelete = async (lobbyId) => {
@@ -35,27 +35,27 @@ function LobbyManagementPage() {
   return (
     <Container>
       <Typography variant="h4" mt={5}>Lobi Yönetimi</Typography>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>İsim</TableCell>
-            <TableCell>Tip</TableCell>
-            <TableCell>İşlemler</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {lobbies.map((lobby) => (
-            <TableRow key={lobby._id}>
-              <TableCell>{lobby.name}</TableCell>
-              <TableCell>{lobby.type}</TableCell>
-              <TableCell>
-                <Button onClick={() => handleEdit(lobby)}>Düzenle</Button>
-                <Button onClick={() => handleDelete(lobby._id)}>Sil</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <MaterialTable
+        title="Lobi Yönetimi"
+        columns={[
+          { title: 'İsim', field: 'name' },
+          { title: 'Tip', field: 'type' }
+        ]}
+        data={lobbies}
+        actions={[
+          {
+            icon: 'edit',
+            tooltip: 'Düzenle',
+            onClick: (event, rowData) => handleEdit(rowData)
+          },
+          {
+            icon: 'delete',
+            tooltip: 'Sil',
+            onClick: (event, rowData) => handleDelete(rowData._id)
+          }
+        ]}
+        options={{ actionsColumnIndex: -1 }}
+      />
     </Container>
   );
 }

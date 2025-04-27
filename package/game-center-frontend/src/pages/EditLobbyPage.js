@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useState, useEffect } from 'react';
 import {
   TextField,
@@ -10,72 +11,81 @@ import {
   Typography,
   Checkbox,
   FormControlLabel,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Alert
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
-
-import { createLobby } from '../services/lobbyService';
+import { getLobby, updateLobby } from '../services/lobbyService';
 import { getGames } from '../services/gameService';
 
-function CreateLobbyPage() {
+function EditLobbyPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const [name, setName] = useState('');
   const [type, setType] = useState('normal');
   const [password, setPassword] = useState('');
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
-  const [submitError, setSubmitError] = useState('');
   const [gamesList, setGamesList] = useState([]);
   const [selectedGame, setSelectedGame] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [showModal, setShowModal] = useState(false);
-  const [newLobbyLink, setNewLobbyLink] = useState('');
-  const [newLobbyId, setNewLobbyId] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   useEffect(() => {
-    const fetchGames = async () => {
-      const data = await getGames();
-      setGamesList(data);
+    const fetchData = async () => {
+      try {
+        const lobby = await getLobby(id);
+        setName(lobby.name);
+        setType(lobby.type);
+        setIsPasswordProtected(!!lobby.password);
+        setPassword(lobby.password || '');
+        setSelectedGame(lobby.gameId || '');
+        if (lobby.startDate) setStartDate(new Date(lobby.startDate));
+        if (lobby.endDate) setEndDate(new Date(lobby.endDate));
+      } catch (error) {
+        console.error('Fetch lobby error:', error);
+        setSubmitError(t('lobbyUpdateFailed'));
+      }
     };
-    fetchGames();
-  }, []);
+    fetchData();
+    const fetchGamesData = async () => {
+      const games = await getGames();
+      setGamesList(games);
+    };
+    fetchGamesData();
+  }, [id, t]);
 
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const lobbyPayload = {
+      await updateLobby(id, {
         name,
         type,
         password: isPasswordProtected ? password : null,
         gameId: selectedGame,
-        ...(type === 'event' && { startDate, endDate }),
-      };
-      const newLobby = await createLobby(lobbyPayload);
-      setNewLobbyId(newLobby._id);
-      const link = `${window.location.origin}/lobbies/${newLobby._id}`;
-      setNewLobbyLink(link);
-      setShowModal(true);
+        ...(type === 'event' && { startDate, endDate })
+      });
+      navigate('/home');
     } catch (error) {
-      console.error('Lobi oluşturma hatası:', error);
-      setSubmitError(t('lobbyCreationFailed') || 'Lobi oluşturulamadı. Lütfen bilgilerinizi kontrol edin.');
+      console.error('Update lobby error:', error);
+      setSubmitError(t('lobbyUpdateFailed'));
     }
   };
 
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" align="center" mt={5}>
-        {t('createLobby')}
+        {t('updateLobby')}
       </Typography>
-      {submitError && <Alert severity="error" sx={{ mt: 2 }}>{submitError}</Alert>}
+      {submitError && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {submitError}
+        </Alert>
+      )}
       <form onSubmit={handleSubmit}>
         <TextField
           label={t('lobbyName')}
@@ -91,22 +101,10 @@ function CreateLobbyPage() {
             labelId="lobby-type-label"
             value={type}
             onChange={e => setType(e.target.value)}
+            label={t('lobbyType')}
           >
             <MenuItem value="event">{t('event')}</MenuItem>
             <MenuItem value="normal">{t('normal')}</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl fullWidth margin="normal" required>
-          <InputLabel id="game-select-label">{t('availableGames')}</InputLabel>
-          <Select
-            labelId="game-select-label"
-            value={selectedGame}
-            onChange={e => setSelectedGame(e.target.value)}
-            label={t('availableGames')}
-          >
-            {gamesList.map(game => (
-              <MenuItem key={game.id} value={game.id}>{game.name}</MenuItem>
-            ))}
           </Select>
         </FormControl>
         <FormControlLabel
@@ -129,47 +127,51 @@ function CreateLobbyPage() {
             required
           />
         )}
+        <FormControl fullWidth margin="normal" required>
+          <InputLabel id="game-select-label">{t('availableGames')}</InputLabel>
+          <Select
+            labelId="game-select-label"
+            value={selectedGame}
+            onChange={e => setSelectedGame(e.target.value)}
+            label={t('availableGames')}
+          >
+            {gamesList.map(game => (
+              <MenuItem key={game.id} value={game.id}>
+                {game.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         {type === 'event' && (
           <LocalizationProvider dateAdapter={AdapterDateFns}>
-            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
             <DateTimePicker
               label={t('eventStart')}
               value={startDate}
               onChange={newValue => setStartDate(newValue)}
-              renderInput={params => <TextField {...params} fullWidth margin="normal" required />}  
+              renderInput={params => (
+                <TextField {...params} fullWidth margin="normal" required />
+              )}
             />
-            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
             <DateTimePicker
               label={t('eventEnd')}
               value={endDate}
               onChange={newValue => setEndDate(newValue)}
-              renderInput={params => <TextField {...params} fullWidth margin="normal" required />}  
+              renderInput={params => (
+                <TextField {...params} fullWidth margin="normal" required />
+              )}
             />
           </LocalizationProvider>
         )}
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          size="large"
-        >
-          {t('createLobby')}
+        <Button type="submit" variant="contained" color="primary" fullWidth size="large" sx={{ mt: 2 }}>
+          {t('updateLobby')}
+        </Button>
+        <Button variant="outlined" fullWidth size="large" sx={{ mt: 2 }} onClick={() => navigate('/home')}>
+          {t('cancel')}
         </Button>
       </form>
-      <Dialog open={showModal} onClose={() => setShowModal(false)}>
-        <DialogTitle>{t('lobbyCreated')}</DialogTitle>
-        <DialogContent>
-          <Typography>{t('shareLink')}:</Typography>
-          <TextField value={newLobbyLink} fullWidth InputProps={{ readOnly: true }} margin="normal" />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => navigator.clipboard.writeText(newLobbyLink)}>{t('copy')}</Button>
-          <Button onClick={() => { setShowModal(false); navigate(`/lobbies/${newLobbyId}/chat`); }}>{t('goToLobby')}</Button>
-        </DialogActions>
-      </Dialog>
     </Container>
   );
 }
 
-export default CreateLobbyPage;
+export default EditLobbyPage;
+/* eslint-enable react/jsx-props-no-spreading */

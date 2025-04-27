@@ -1,47 +1,56 @@
-// routes/auth.js
-const express = require('express');
-const router = express.Router();
-const authMiddleware = require('../middleware/authMiddleware');
-const axios = require('axios');
+// routes/auth.js: Kimlik doğrulama işlemlerine ait tüm HTTP endpoint’lerini tanımlar
+// - /send-reset-code: Şifre sıfırlama linki üretir ve e-posta gönderir (rate limit ile korunur)
+// - /reset-password: Gelen kod ve yeni şifre ile Firebase şifresini günceller
+// - /login: Email ve şifre ile kullanıcı girişi yapar
+// - /register: Yeni kullanıcı kaydı gerçekleştirir
+// - /user: Auth middleware ile girişli kullanıcının profilini döner
+// - /verify-email: E-posta doğrulama linki üretir ve gönderir
 
-const authController = require('../controllers/authController');
-const rateLimit = require('express-rate-limit');
-const { check } = require('express-validator');
+const express = require('express'); // Express router oluşturmak için
+const router = express.Router(); // Yeni router instance
+const authMiddleware = require('../middleware/authMiddleware'); // Kimlik doğrulama kontrolü middleware
+const axios = require('axios'); // HTTP istekleri yapmak için
 
-// Rate Limiting Ayarı (IP başına 15 dakika içinde en fazla 5 istek)
+const authController = require('../controllers/authController'); // Auth işlemlerini yöneten controller
+const rateLimit = require('express-rate-limit'); // IP başına istek sınırı için
+const { check } = require('express-validator'); // İstek doğrulaması için
+
+// Rate limiting: IP başına 15 dakikada en fazla 5 şifre sıfırlama isteği
 const resetLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 5,
-    message: 'Çok fazla şifre sıfırlama isteğinde bulundunuz, lütfen daha sonra tekrar deneyin.',
-  });
-  
-  router.post(
-    '/send-reset-code',
-    resetLimiter,
-    [check('email').isEmail().withMessage('Geçerli bir e-posta adresi giriniz.')],
-    authController.sendResetCode
-  );
-  
-  router.post(
-    '/reset-password',
-    [
-      check('email').isEmail().withMessage('Geçerli bir e-posta adresi giriniz.'),
-      check('resetCode').notEmpty().withMessage('Doğrulama kodu gereklidir.'),
-      check('newPassword').isLength({ min: 6 }).withMessage('Şifre en az 6 karakter olmalıdır.'),
-    ],
-    authController.resetPassword
-  );
+  windowMs: 15 * 60 * 1000, // 15 dakika
+  max: 5, // Maksimum 5 istek
+  message: 'Çok fazla şifre sıfırlama isteğinde bulundunuz, lütfen daha sonra tekrar deneyin.',
+});
 
-// Giriş Yap
+// POST /send-reset-code: Şifre sıfırlama linki oluştur ve mail ile gönder
+router.post(
+  '/send-reset-code',
+  resetLimiter, // Rate limit uygulanır
+  [check('email').isEmail().withMessage('Geçerli bir e-posta adresi giriniz.')], // Email doğrulaması
+  authController.sendResetCode // Controller fonksiyonu
+);
+
+// POST /reset-password: OOB kodunu ve yeni şifreyi alıp Firebase şifresini günceller
+router.post(
+  '/reset-password',
+  [
+    check('email').isEmail().withMessage('Geçerli bir e-posta adresi giriniz.'),
+    check('resetCode').notEmpty().withMessage('Doğrulama kodu gereklidir.'),
+    check('newPassword').isLength({ min: 6 }).withMessage('Şifre en az 6 karakter olmalıdır.'),
+  ],
+  authController.resetPassword
+);
+
+// POST /login: Email ve şifre ile kullanıcı girişi
 router.post('/login', authController.login);
 
-// Kayıt Ol
+// POST /register: Yeni kullanıcı kaydı
 router.post('/register', authController.register);
 
-// Kullanıcı Bilgisi Al
+// GET /user: Girişli kullanıcının profil bilgisini döner
 router.get('/user', authMiddleware, authController.getUser);
 
-// E-posta Doğrulama
+// POST /verify-email: E-posta doğrulama linki oluştur ve gönder
 router.post('/verify-email', authController.verifyEmail);
 
 module.exports = router;
