@@ -1,70 +1,80 @@
-# Game Center
+# Oyun Merkezi
 
-Game Center is a full-stack web application for playing casual games and managing real-time lobbies with chat. It uses a monorepo structure powered by Lerna and includes:
+Oyun Merkezi, gündelik oyunlar oynamak ve gerçek zamanlı lobilerde sohbet etmek için geliştirilmiş tam stack bir web uygulamasıdır. Lerna tabanlı monorepo yapısına sahiptir ve şunları içerir:
 
-- **Backend**: Node.js + Express with Firebase Auth (Google & email/password), Firestore database and WebSocket for chat.
-- **Frontend**: React with MUI, Redux Toolkit, React Query, React Router, i18n (react-i18next), and PWA support.
-- **Games**: Lerna-managed packages (e.g., 2048 and Tombola) lazy-loaded into the React app.
-
----
-
-## v0.2 (2025-04-27)
-- Lobby editing and deletion (`src/pages/EditLobbyPage.js`).
-- Event scheduling with date-time pickers & countdown timers.
-- Lobby listing and creation in `GameDetailPage.js`.
-- Chat notifications via browser Notification API.
-- Extended i18n support (English & Turkish).
-
----
-## Features
-
-- 🔐 User authentication (Google & Email/Password) via Firebase Auth
-- 💬 Real-time chat in lobbies (max 4 participants) via WebSocket
-- 🎮 Play 2048 and Tombola with instructions and images
-- 🎨 Light/Dark theme toggle in settings
-- 📦 Component-driven architecture using Material-UI
-- ⚛️ State management: Redux Toolkit & React Query
-- 🛡️ Security: helmet, rate limiting, input sanitization
-- 🌐 Progressive Web App (offline support + manifest)
-- 🧪 Testing: Jest + React Testing Library (unit), Cypress (E2E)
-- 📚 Documentation: Storybook for components, `TECHNICAL_DOCUMENTATION.md`
+- **Arka Uç**: Node.js v22 + Express ile, express-session & memorystore kullanarak oturum yönetimi; Firebase Kimlik Doğrulama (Google & e-posta/şifre), Firestore, cookie-parser, body-parser, helmet, compression, morgan ve sohbet için WebSocket.
+- **Ön Uç**: React 18, MUI v6, Context API, React Query, React Router v6, i18next (react-i18next), react-material-table, react-number-format ve PWA desteği.
+- **Oyunlar**: Lerna ile yönetilen paketler (örn. 2048 ve Tombala), React `lazy`/`Suspense` ile dinamik yüklenir.
 
 ---
 
-## Getting Started
+## Sürüm Notları
 
-### Prerequisites
+### v0.2 (2025-04-27)
+- Lobi düzenleme ve silme (`src/pages/EditLobbyPage.js`).
+- Etkinlik zamanlaması ile tarih-saat seçicileri ve geri sayım sayaçları.
+- Lobi listeleme ve oluşturma `GameDetailPage.js` içinde.
+- Tarayıcı Bildirim API'si ile sohbet bildirimleri.
+- Genişletilmiş i18n desteği (İngilizce & Türkçe).
 
-- Node.js v18 or later
-- Yarn package manager
-- Firebase project with Service Account JSON
+### v0.3 (2025-04-27)
+- Redux Toolkit yerine Context API'ye geçildi.
+- MUI v6'ya yükseltildi.
+- LobiYönetimiSayfası'nda MUI Tablosu yerine react-material-table kullanıldı.
+- Anasayfa'da react-number-format ile sayı formatlaması eklendi.
+- Oturum yönetimi için express-session & memorystore entegre edildi.
+- Güvenlik ve performans için cookie-parser, body-parser, helmet, compression, morgan middlewares eklendi.
+- Node.js motoru >=22 olarak ayarlandı.
 
-### Installation
+---
 
+## Özellikler
+- 🔐 Firebase Auth (Google & E-posta/Şifre) ile kullanıcı kimlik doğrulama
+- 💬 Lobilerde gerçek zamanlı sohbet (maks. 4 katılımcı) WebSocket ile
+- 🎮 2048 ve Tombala oyunları, yönergeler ve görsellerle
+- 🎨 Ayarlar sayfasında Açık/Koyu tema geçişi
+- 📦 MUI bileşen tabanlı mimari
+- ⚛️ Durum yönetimi Context API & React Query
+- 📊 Tablo işlemleri için react-material-table
+- 🔢 Sayı formatlama react-number-format ile
+- 🛡️ Güvenlik: helmet, rate limiting, input sanitization
+- 🌐 PWA: çevrimdışı destek ve manifest
+- 🧪 Testler: Jest + React Testing Library (birim), Cypress (E2E)
+- 📚 Belgeler: Storybook & `TECHNICAL_DOCUMENTATION.md`
+
+---
+
+## Başlarken
+
+### Ön Koşullar
+- Node.js v22 veya üzeri
+- Yarn paket yöneticisi
+- Firebase projesi için Service Account JSON
+
+### Kurulum
 ```bash
-# Clone repository
+# Depoyu klonlayın
 git clone https://github.com/mtgsoftworks/Game-Center.git
 cd Game-Center
 
-# Install all packages via Lerna
+# Paketleri yükleyin
 yarn install
 ```
 
-### Environment Variables
-
-Copy example env files and fill your values:
+### Ortam Değişkenleri
+Örnek `.env` dosyalarını kopyalayın ve değerlerinizi girin:
 
 ```bash
-# Backend
+# Arka Uç
 cp package/game-center-backend/.env.example package/game-center-backend/.env
-# Frontend
+# Ön Uç
 cp package/game-center-frontend/.env.example package/game-center-frontend/.env
 ```
 
-#### Backend `.env`
+#### Arka Uç `.env`
 ```
 PORT=3001
-GOOGLE_APPLICATION_CREDENTIALS_JSON='<PASTE_FIREBASE_SERVICE_ACCOUNT_JSON>'
+GOOGLE_APPLICATION_CREDENTIALS_JSON='<SERVICE_ACCOUNT_JSON>'
 FIREBASE_API_KEY=YOUR_FIREBASE_API_KEY
 FIREBASE_AUTH_DOMAIN=YOUR_FIREBASE_AUTH_DOMAIN
 FIREBASE_PROJECT_ID=YOUR_FIREBASE_PROJECT_ID
@@ -73,12 +83,9 @@ FIREBASE_MESSAGING_SENDER_ID=YOUR_FIREBASE_MESSAGING_SENDER_ID
 FIREBASE_APP_ID=YOUR_FIREBASE_APP_ID
 FIREBASE_DATABASE_URL=YOUR_FIREBASE_DATABASE_URL
 FIREBASE_MEASUREMENT_ID=YOUR_FIREBASE_MEASUREMENT_ID
-MAILTRAP_TOKEN=YOUR_MAILTRAP_TOKEN
-MAILTRAP_SENDER_EMAIL=YOUR_MAILTRAP_SENDER_EMAIL
-MAILTRAP_SENDER_NAME=Game Center
 ```
 
-#### Frontend `.env`
+#### Ön Uç `.env`
 ```
 REACT_APP_API_URL=http://localhost:3001/api
 VITE_FIREBASE_API_KEY=YOUR_FIREBASE_API_KEY
@@ -91,74 +98,72 @@ VITE_FIREBASE_DATABASE_URL=YOUR_FIREBASE_DATABASE_URL
 VITE_FIREBASE_MEASUREMENT_ID=YOUR_FIREBASE_MEASUREMENT_ID
 ```
 
-### Running Locally
-
+### Yerel Çalıştırma
 ```bash
-# Backend
+# Arka Uç
 cd package/game-center-backend
 yarn dev
 
-# Frontend (in a new terminal)
+# Ön Uç (yeni terminal)
 cd package/game-center-frontend
 yarn start
 ```
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:3001/api
+- Ön Uç: http://localhost:3000
+- Arka Uç API: http://localhost:3001/api
 
 ---
 
-## Testing
+## Testler
 
 ```bash
-# Run backend & frontend unit tests
+# Birim testleri çalıştırın
 yarn test
 
-# Run end-to-end tests with Cypress
+# E2E testleri Cypress ile çalıştırın
 yarn workspace game-center-frontend cypress open
 ```
 
 ---
 
-## Deployment
+## Dağıtım
 
-### Backend
+### Arka Uç
 
-- Build Docker image:
+- Docker imajını oluşturun:
   ```bash
   docker build -t game-center-backend ./package/game-center-backend
   ```
-- Run container with env:
+- Konteynırı ortam değişkenleriyle çalıştırın:
   ```bash
   docker run -d \
-    -e GOOGLE_APPLICATION_CREDENTIALS_JSON="<JSON>" \
+    -e GOOGLE_APPLICATION_CREDENTIALS_JSON="<SERVICE_ACCOUNT_JSON>" \
     -e FIREBASE_* \
-    -e MAILTRAP_* \
     -p 3001:3001 game-center-backend
   ```
 
-### Frontend
+### Ön Uç
 
-- Build static files:
+- Statik dosyaları oluşturun:
   ```bash
   cd package/game-center-frontend
   yarn build
   ```
-- Deploy `build/` folder to any static hosting (Netlify, Vercel, S3+CloudFront).
+- `build/` klasörünü herhangi bir statik barındırma hizmetine (Netlify, Vercel, S3+CloudFront) dağıtın.
 
 ---
 
-## Contributing
+## Katkıda Bulunma
 
-Please read [TECHNICAL_DOCUMENTATION.md](TECHNICAL_DOCUMENTATION.md) and refer to coding standards.
+Lütfen `TECHNICAL_DOCUMENTATION.md`'yi okuyun ve kodlama standartlarına uyun.
 
-1. Fork the repo
-2. Create a feature branch
-3. Follow linting and testing guidelines
-4. Submit a pull request
+1. Deposunu çatalla
+2. Özellik dalı oluştur
+3. Düzenleme ve test kurallarına uyun
+4. Çekme isteği gönderin
 
 ---
 
-## License
+## Lisans
 
-MIT License
+MIT Lisansı

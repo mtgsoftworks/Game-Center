@@ -13,6 +13,7 @@
   "availableLobbies": "Available Lobbies",
   "availableGames": "Available Games",
   "games": "Games",
+  "homePage": "Home Page",
   "joinLobby": "Join Lobby",
   "viewDetails": "View Details",
   "loading": "Loading...",
@@ -56,5 +57,7 @@
   "startsAt": "Starts at",
   "startsIn": "Starts in",
   "ongoing": "Ongoing",
-  "ended": "Ended"
+  "ended": "Ended",
+  "rules": "Rules",
+  "backToHome": "Back to Home"
 }

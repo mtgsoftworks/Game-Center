@@ -65,6 +65,14 @@ function Navbar() {
               <MenuItem
                 onClick={() => {
                   handleClose();
+                  navigate('/home#chat-section');
+                }}
+              >
+                {t('chat')}
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleClose();
                   navigate('/profile');
                 }}
               >

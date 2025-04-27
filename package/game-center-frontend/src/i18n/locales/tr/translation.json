@@ -13,6 +13,12 @@
   "availableLobbies": "Mevcut Lobiler",
   "availableGames": "Mevcut Oyunlar",
   "games": "Oyunlar",
+  "homePage": "Ana Sayfa",
+  "howToPlay": "Nasıl Oynanır",
+  "howToPlay_2048": "Kareleri kaydırarak sayıları birleştirip 2048 sayısına ulaşın.",
+  "howToPlay_bingo": "Kartınızdaki sayıları işaretleyerek bir satır veya full house tamamlayın.",
+  "inviteCode": "Davet Kodu",
+  "joinByCode": "Kodu ile Katıl",
   "joinLobby": "Lobiye Katıl",
   "viewDetails": "Detayları Görüntüle",
   "loading": "Yükleniyor...",
@@ -71,5 +77,13 @@
   "lobbyStatus": "Lobi Durumu",
   "lobbyStatusWaiting": "Beklemede",
   "lobbyStatusStarted": "Başladı",
-  "lobbyStatusFinished": "Bitti"
+  "lobbyStatusFinished": "Bitti",
+  "settings": "Ayarlar",
+  "darkMode": "Koyu Mod",
+  "language": "Dil",
+  "sound": "Ses",
+  "notifications": "Bildirimler",
+  "saveSettings": "Ayarları Kaydet",
+  "settingsSaved": "Ayarlar kaydedildi.",
+  "rules": "Kurallar"
 }

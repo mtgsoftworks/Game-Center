@@ -2,11 +2,14 @@ import React, { createContext, useReducer } from 'react';
 
 export const AppContext = createContext();
 
+const savedThemeMode = localStorage.getItem('themeMode') || 'ui';
+const savedLocale = localStorage.getItem('locale') || 'en';
+
 const initialState = {
   auth: { user: null, token: null },
   lobby: { lobbies: [] },
-  themeMode: 'ui', // 'ui' or 'game'
-  locale: 'en'
+  themeMode: savedThemeMode,
+  locale: savedLocale
 };
 
 function reducer(state, action) {
@@ -16,8 +19,10 @@ function reducer(state, action) {
     case 'SET_LOBBIES':
       return { ...state, lobby: { ...state.lobby, lobbies: action.payload } };
     case 'SET_THEME_MODE':
+      localStorage.setItem('themeMode', action.payload);
       return { ...state, themeMode: action.payload };
     case 'SET_LOCALE':
+      localStorage.setItem('locale', action.payload);
       return { ...state, locale: action.payload };
     default:
       return state;

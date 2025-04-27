@@ -1,17 +1,20 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useState, useContext } from 'react';
-import { Container, Typography, Grid, Card, CardContent, CardMedia, Button, Dialog, DialogTitle, DialogContent, DialogActions, Box, Link } from '@mui/material';
+import { Container, Typography, Grid, Card, CardContent, CardMedia, Button, Dialog, DialogTitle, DialogContent, DialogActions, Box, Chip, TextField, List, ListItem, ListItemText, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { NumericFormat } from 'react-number-format';
 import { motion } from 'framer-motion';
+import { AppContext } from '../context/AppContext';
+import { getCurrentUser } from '../services/authService';
 import { getGames } from '../services/gameService';
 import { getLobbies, deleteLobby } from '../services/lobbyService';
-import game2048Image from '../assets/2048.png';
-import { AppContext } from '../context/AppContext';
 
-const tombolaImage = 'https://via.placeholder.com/300x150?text=Tombola';
+// Tombala ve 2048 oyun logoları public klasöründen
+const tombolaImage = '/tombala_logo.png';
+const image2048 = '/2048.png';
 
 function HomePage() {
   const { t } = useTranslation();
@@ -23,18 +26,21 @@ function HomePage() {
   const [now, setNow] = useState(new Date());
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [lobbyToDelete, setLobbyToDelete] = useState(null);
+  const [inviteCode, setInviteCode] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
+      // Kullanıcı bilgisi al ve context'e kaydet
+      const userData = await getCurrentUser();
+      if (userData) dispatch({ type: 'SET_USER', payload: { user: userData, token: state.auth.token } });
+      // Oyun ve lobi verilerini getir
       const gamesData = await getGames();
       setGames(gamesData);
-
       const lobbiesData = await getLobbies();
       setLobbies(lobbiesData);
     };
-
     fetchData();
-  }, []);
+  }, [dispatch, state.auth.token]);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -122,15 +128,46 @@ function HomePage() {
               transition={{ duration: 0.5, delay: idx * 0.1 }}
             >
               <Card sx={{ mb: 2 }}>
-                <CardMedia component="img" src={game.id === '2048' ? game2048Image : tombolaImage} alt={game.name} sx={{ width: '100%', height: 'auto', mb: 1 }} />
+                <CardMedia component="img" src={game.id === '2048' ? image2048 : tombolaImage} alt={game.name} sx={{ width: '100%', height: 'auto', mb: 1 }} />
                 <CardContent>
                   <Typography variant="h6">{game.name}</Typography>
                   <Typography>{game.description}</Typography>
-                  <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic' }}>
-                    {t('howToPlay')}: {game.id === '2048'
-                      ? 'Slide tiles to combine numbers until you reach 2048.'
-                      : 'Mark numbers on your card and complete a line or full house to win.'}
+                  <Typography variant="subtitle2" gutterBottom>
+                    {t('howToPlay')}
                   </Typography>
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    {game.id === '2048'
+                      ? t('howToPlay_2048')
+                      : t('howToPlay_bingo')}
+                  </Typography>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography variant="subtitle2">{t('rules')}</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <List disablePadding>
+                        {game.id === '2048' ? (
+                          <> {/* 2048 kuralları */}
+                            <ListItem><ListItemText primary="1. Tahtada 4×4 blok; değer 2 veya 4."/></ListItem>
+                            <ListItem><ListItemText primary="2. Ok tuşları veya kaydırmayla bloklar kaydırılır."/></ListItem>
+                            <ListItem><ListItemText primary="3. Aynı bloklar birleşir (örn.2+2=4)."/></ListItem>
+                            <ListItem><ListItemText primary="4. Her hamleden sonra rastgele 2 veya 4 eklenir."/></ListItem>
+                            <ListItem><ListItemText primary="5. Hamle kalmadığında oyun biter."/></ListItem>
+                            <ListItem><ListItemText primary="6. 2048 sayısına ulaşıldığında kazanılır."/></ListItem>
+                          </>
+                        ) : (
+                          <> {/* Tombala kuralları */}
+                            <ListItem><ListItemText primary="1. Her oyuncuya 5×5 kart verilir."/></ListItem>
+                            <ListItem><ListItemText primary="2. Host belirli aralıklarla sayı çeker."/></ListItem>
+                            <ListItem><ListItemText primary="3. Çekilen sayı işaretlenir."/></ListItem>
+                            <ListItem><ListItemText primary="4. Tek satır/sütun/çapraz tamamlayan kazanır."/></ListItem>
+                            <ListItem><ListItemText primary="5. Tüm hücreler işaretlenir: Full Tombala."/></ListItem>
+                            <ListItem><ListItemText primary="6. İlk tamamlayan ödülü alır."/></ListItem>
+                          </>
+                        )}
+                      </List>
+                    </AccordionDetails>
+                  </Accordion>
                 </CardContent>
                 <Button variant="contained" color="primary" disabled sx={{ mt: 1 }}>
                   {t('play')}
@@ -148,8 +185,11 @@ function HomePage() {
             <Card key={lobby._id} sx={{ mb: 2 }}>
               <CardContent>
                 <Typography variant="h6">{lobby.name}</Typography>
+                <Box display="flex" alignItems="center" mb={1}>
+                  {lobby.password && <Chip label="Şifreli" size="small" color="warning" sx={{ mr: 1 }} />}
+                  {lobby.type === 'event' && <Chip label="Etkinlik" size="small" color="primary" />}
+                </Box>
                 <Typography variant="body2">{renderLobbyStatus(lobby)}</Typography>
-                {lobby.password && <Typography>{t('passwordProtected')}</Typography>}
               </CardContent>
               <Button variant="contained" color="primary" onClick={() => navigate(`/lobbies/${lobby._id}/chat`)}>
                 {t('join')}
@@ -164,13 +204,43 @@ function HomePage() {
           ))}
         </Grid>
       </Grid>
+      {/* Dummy bileşenler */}
+      <Grid container spacing={3} mt={4} id="chat-section">
+        <Grid item xs={12} md={4}>
+          <Typography variant="h6">{t('chat')}</Typography>
+          <Box sx={{ border: '1px dashed grey', height: 200, p: 2 }}>{t('chat')} bileşeni için taslak</Box>
+          <Box mt={2} display="flex" alignItems="center">
+            <TextField
+              label={t('inviteCode')}
+              variant="outlined"
+              size="small"
+              sx={{ mr: 1 }}
+              value={inviteCode}
+              onChange={e => setInviteCode(e.target.value)}
+            />
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => navigate(`/lobbies/${inviteCode}/chat`)}
+            >{t('joinByCode')}</Button>
+          </Box>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Typography variant="h6">{t('statistics')}</Typography>
+          <Box sx={{ border: '1px dashed grey', p: 2 }}>{t('statisticsComingSoon')}</Box>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Typography variant="h6">{t('achievements')}</Typography>
+          <Box sx={{ border: '1px dashed grey', p: 2 }}>{t('achievementsComingSoon')}</Box>
+        </Grid>
+      </Grid>
       <Button variant="contained" color="primary" sx={{ mt: 3 }} onClick={handleCreateLobby}>
         {t('createLobby')}
       </Button>
       {/* Footer */}
       <Box mt={4} pb={2}>
         <Typography variant="caption" align="center">
-          2025 &copy; MTG Softworks All Rights Reserved. Web tasarım için <Link href="https://www.figma.com" target="_blank" rel="noopener">Figma</Link> kullanabilirsiniz.
+          2025 &copy; MTG Softworks All Rights Reserved.
         </Typography>
       </Box>
       <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>

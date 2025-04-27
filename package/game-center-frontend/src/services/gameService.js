@@ -18,8 +18,12 @@ const fallbackGames = [
 
 export const getGames = async () => {
   try {
-    const response = await axios.get('/games');
-    return response.data;
+    const { data } = await axios.get('/games');
+    if (!data || data.length === 0) {
+      console.warn('API returned no games, using fallbackGames');
+      return fallbackGames;
+    }
+    return data;
   } catch (error) {
     console.error('API çağrısı başarısız oldu, statik oyun verileri kullanılıyor:', error);
     return fallbackGames;
