@@ -1,0 +1,47 @@
+{
+  "name": "game-center-backend",
+  "version": "1.0.0",
+  "description": "Oyun Merkezi Backend Projesi",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "lint": "eslint .",
+    "test": "jest --runInBand"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "body-parser": "^1.20.3",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "csurf": "^1.11.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-session": "^1.17.3",
+    "express-validator": "^7.2.1",
+    "firebase-admin": "^11.5.0",
+    "helmet": "^6.0.0",
+    "memorystore": "^1.6.7",
+    "morgan": "^1.10.0",
+    "node-cron": "^3.0.3",
+    "prom-client": "^14.1.0",
+    "react-google-recaptcha": "^3.1.0",
+    "ws": "^8.13.0",
+    "js-sha256": "^0.9.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.1.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "Mesut Taha Güven",
+  "license": "MIT"
+} 

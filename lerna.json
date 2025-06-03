@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "npmClient": "pnpm",         // pnpm'i kullan
+  "hoist": true,               // ortak bağımlılıkları root'a hoist et (isteğe bağlı)
+  "packages": [
+    "apps/server",
+    "apps/client",
+    "apps/client/src/games/game-2048",
+    "apps/client/src/games/tombala_game"
+  ],
+  "version": "1.0.0"
+}

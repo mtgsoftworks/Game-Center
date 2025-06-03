@@ -1,0 +1,29 @@
+{
+  "name": "game-center",
+  "private": true,
+  "workspaces": [
+    "apps/server",
+    "apps/client",
+    "apps/client/src/games/game-2048",
+    "apps/client/src/games/tombala-game"
+  ],
+  "scripts": {
+    "bootstrap": "pnpm install",
+    "clean": "lerna clean -y",
+    "start:backend": "pnpm --filter \"./apps/server\" start",
+    "start:client": "pnpm --filter \"./apps/client\" start",
+    "start:game-2048": "pnpm --filter \"./apps/client/src/games/game-2048\" start",
+    "start:tombola-game": "pnpm --filter \"./apps/client/src/games/tombala-game\" dev",
+    "start": "pnpm exec concurrently \"pnpm run start:backend\" \"pnpm run start:client\" \"pnpm run start:game-2048\" \"pnpm run start:tombola-game\"",
+    "build": "lerna run build --stream",
+    "test": "lerna run test --stream"
+  },
+  "dependencies": {
+    "yargs": "^17.7.2",
+    "y18n": "^5.0.0"
+  },
+  "devDependencies": {
+    "lerna": "^8.1.2",
+    "concurrently": "^7.6.0"
+  }
+}
